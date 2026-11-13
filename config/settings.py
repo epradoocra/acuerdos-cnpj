@@ -90,6 +90,9 @@ if os.environ.get("MSSQL_HOST"):
             "CONN_HEALTH_CHECKS": True,
             "OPTIONS": {
                 "driver": os.environ.get("MSSQL_DRIVER", "ODBC Driver 18 for SQL Server"),
+                # Tiempo de espera del inicio de sesión (s). Por defecto el driver espera solo 15 s, insuficiente
+                # para despertar una base serverless en pausa.
+                "connection_timeout": int(os.environ.get("MSSQL_LOGIN_TIMEOUT", "90")),
                 # Azure SQL exige cifrado; el tiempo de espera amplio cubre el arranque de bases "serverless" en pausa.
                 "extra_params": os.environ.get(
                     "MSSQL_EXTRA_PARAMS", "Encrypt=yes;TrustServerCertificate=no;Connection Timeout=60"),
