@@ -1,0 +1,68 @@
+{% extends "base.html" %}{% load seguimiento_tags %}
+{% block title %}Tablero · Seguimiento de Acuerdos{% endblock %}
+{% block content %}
+<h1>Tablero de seguimiento</h1>
+<p class="sub">Corte al {{ hoy|date:"j \d\e F \d\e Y" }}</p>
+
+<div class="kpis">
+  <div class="kpi"><b>{{ total }}</b><span>Compromisos registrados</span></div>
+  <div class="kpi verde"><b>{{ cumplidos }}</b><span>Cumplidos</span></div>
+  <div class="kpi"><b>{{ en_proceso }}</b><span>En proceso</span></div>
+  <div class="kpi"><b>{{ pendientes }}</b><span>Sin iniciar</span></div>
+  <div class="kpi rojo"><b>{{ n_vencidos }}</b><span>Vencidos sin cumplir</span></div>
+  {% if por_validar %}<div class="kpi ambar"><b>{{ por_validar }}</b><span>{% if user.is_staff %}<a href="{% url 'admin:seguimiento_compromiso_changelist' %}?responsable_validado__exact=0">Responsables por validar</a>{% else %}Responsables por validar{% endif %}</span></div>{% endif %}
+</div>
+
+<h2>Reuniones</h2>
+<div class="panel">
+<table>
+  <thead><tr><th>Reunión</th><th>Fecha</th><th class="num">Acuerdos</th><th>Avance por acuerdo</th></tr></thead>
+  <tbody>
+  {% for r in reuniones %}
+    <tr>
+      <td><a href="{{ r.get_absolute_url }}">{{ r.nombre }}</a></td>
+      <td>{{ r.fecha|date:"d/m/Y"|default:"—" }}</td>
+      <td class="num">{{ r.acuerdos.all|length }}</td>
+      <td>{% for a in r.acuerdos.all %}<a href="{{ a.get_absolute_url }}" title="{{ a.clave }} · {{ a.titulo }} · {{ a.avance }}%"><span class="sem {% if a.estatus == 'cumplido' %}verde{% elif a.estatus == 'vencido' %}rojo{% elif a.estatus == 'en_proceso' %}ambar{% else %}gris{% endif %}"></span></a>{% endfor %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="4">Aún no hay reuniones registradas.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="cols">
+  <div class="panel">
+    <h2 style="margin-top:0">Vencidos</h2>
+    <table><tbody>
+    {% for c in vencidos %}
+      <tr><td><span class="sem rojo"></span><a href="{{ c.acuerdo.get_absolute_url }}#c{{ c.pk }}">{{ c }}</a><div class="meta">{{ c.descripcion|truncatechars:90 }}</div></td>
+          <td>{{ c.responsable.siglas }}</td><td class="num">{{ c.fecha_limite|date:"d/m/Y" }}</td></tr>
+    {% empty %}<tr><td class="meta">Sin compromisos vencidos.</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+  <div class="panel">
+    <h2 style="margin-top:0">Vencen en los próximos 30 días</h2>
+    <table><tbody>
+    {% for c in proximos %}
+      <tr><td><span class="sem ambar"></span><a href="{{ c.acuerdo.get_absolute_url }}#c{{ c.pk }}">{{ c }}</a><div class="meta">{{ c.descripcion|truncatechars:90 }}</div></td>
+          <td>{{ c.responsable.siglas }}</td><td class="num">{{ c.fecha_limite|date:"d/m/Y" }}</td></tr>
+    {% empty %}<tr><td class="meta">Nada vence en los próximos 30 días.</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+</div>
+
+<h2>Carga por responsable</h2>
+<div class="panel">
+<table>
+  <thead><tr><th>Institución</th><th class="num">Total</th><th class="num">Abiertos</th><th class="num">Vencidos</th><th class="num">Cumplidos</th></tr></thead>
+  <tbody>
+  {% for i in por_responsable %}
+    <tr><td><a href="{% url 'seguimiento:institucion' i.pk %}">{{ i.siglas }}</a> <span class="meta">{{ i.nombre }}</span></td>
+        <td class="num">{{ i.total }}</td><td class="num">{{ i.abiertos }}</td>
+        <td class="num">{% if i.vencidos %}<b style="color:var(--rojo)">{{ i.vencidos }}</b>{% else %}0{% endif %}</td>
+        <td class="num">{{ i.cumplidos }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

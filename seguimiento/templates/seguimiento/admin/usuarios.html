@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Usuarios · Administración{% endblock %}
+{% block content %}
+<h1>Usuarios <a class="btn chico" href="{% url 'seguimiento:admin_usuario_crear' %}">+ Nuevo usuario</a></h1>
+{% with seccion="usuarios" %}{% include "seguimiento/admin/_subnav.html" %}{% endwith %}
+
+<form class="panel filtros-form" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Nombre, usuario, correo o institución" aria-label="Buscar usuario">
+  <select name="perfil" aria-label="Perfil"><option value="">Todos los perfiles</option>
+    {% for p in perfiles %}<option {% if p == perfil %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+  <select name="estado" aria-label="Estado">
+    <option value="">Todos</option>
+    <option value="activos" {% if estado == "activos" %}selected{% endif %}>Activos</option>
+    <option value="inactivos" {% if estado == "inactivos" %}selected{% endif %}>Inactivos</option>
+    <option value="nunca" {% if estado == "nunca" %}selected{% endif %}>Activos que nunca han entrado</option>
+  </select>
+  <button class="btn">Filtrar</button>
+</form>
+
+<div class="panel">
+<table>
+  <thead><tr><th>Usuario</th><th>Nombre</th><th>Perfil</th><th>Institución</th><th>Último acceso</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+  {% for f in filas %}
+    <tr{% if not f.u.is_active %} class="deshabilitado"{% endif %}>
+      <td><b>{{ f.u.username }}</b>{% if f.u == user %} <span class="meta">(usted)</span>{% endif %}</td>
+      <td>{{ f.u.get_full_name|default:"—" }}<div class="meta">{{ f.u.email }}</div></td>
+      <td>{{ f.perfil|default:"—" }}{% if f.u.is_superuser %} <span class="pill en_proceso" title="Acceso total, definido en la instalación">superusuario</span>{% endif %}</td>
+      <td>{% if f.institucion %}{{ f.institucion.siglas }}{% elif f.perfil == "Enlace institucional" %}<span class="pill vencido">sin asignar</span>{% else %}—{% endif %}</td>
+      <td>{{ f.u.last_login|date:"d/m/Y H:i"|default:"nunca" }}</td>
+      <td>{% if f.u.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+      <td class="acc"><a href="{% url 'seguimiento:admin_usuario_editar' f.u.pk %}">Editar</a></td>
+    </tr>
+  {% empty %}<tr><td colspan="7" class="meta">Ningún usuario con ese filtro.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

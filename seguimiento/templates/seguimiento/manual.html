@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Manual de usuario · Seguimiento de Acuerdos{% endblock %}
+{% block content %}
+<h1>Manual de usuario</h1>
+<p class="sub">Cómo consultar y actualizar el cumplimiento de los acuerdos de cada reunión.</p>
+
+<div class="manual">
+<nav class="indice panel">
+  <b>Contenido</b>
+  <ol>
+    <li><a href="#ingreso">Ingresar al sistema</a></li>
+    <li><a href="#perfiles">Perfiles de usuario</a></li>
+    <li><a href="#conceptos">Conceptos básicos</a></li>
+    <li><a href="#tablero">El tablero</a></li>
+    <li><a href="#buscar">Buscar por palabra o frase</a></li>
+    <li><a href="#reunion">Consultar una reunión</a></li>
+    <li><a href="#acuerdo">Consultar un acuerdo</a></li>
+    <li><a href="#avance">Registrar un avance</a></li>
+    <li><a href="#entregas">Registrar la entrega de una institución</a></li>
+    <li><a href="#institucion">Pendientes de una institución</a></li>
+    <li><a href="#st">Tareas de la Secretaría Técnica</a></li>
+    <li><a href="#admin">Administración del sistema</a></li>
+    <li><a href="#cuenta">Mi cuenta</a></li>
+    <li><a href="#faq">Preguntas frecuentes</a></li>
+  </ol>
+</nav>
+
+<div class="cuerpo">
+
+<section class="panel" id="ingreso">
+  <h2>1. Ingresar al sistema</h2>
+  <ol class="pasos">
+    <li>Abra en su navegador la dirección que le proporcionó la Secretaría Técnica .</li>
+    <li>Escriba su <b>usuario</b> y <b>contraseña</b> y pulse <b>Entrar</b>.</li>
+    <li>Al terminar, use <b>Salir</b> en la esquina superior derecha, sobre todo en equipos compartidos.</li>
+  </ol>
+  <p class="nota">Si olvidó su contraseña, pida al administrador del sistema una contraseña temporal. El sistema no envía correos de recuperación.</p>
+</section>
+
+<section class="panel" id="perfiles">
+  <h2>2. Perfiles de usuario</h2>
+  <table>
+    <thead><tr><th>Perfil</th><th>Quién lo usa</th><th>Qué puede hacer</th></tr></thead>
+    <tbody>
+      <tr><td><b>Consulta</b></td><td>Titulares, órganos de control</td><td>Ver tablero, reuniones, acuerdos, bitácoras y evidencias. Exportar a CSV.</td></tr>
+      <tr><td><b>Enlace institucional</b></td><td>Persona designada por cada fiscalía o instancia</td><td>Todo lo de Consulta, más <b>registrar avances</b> y <b>actualizar entregas</b>.</td></tr>
+      <tr><td><b>Secretaría Técnica</b></td><td>Equipo de la ST de la CNPJ</td><td>Todo lo anterior, más registrar y corregir reuniones, acuerdos, compromisos, entregas y catálogos.</td></tr>
+      <tr><td><b>Administrador del sistema</b></td><td>Responsable de la plataforma</td><td>Todo lo de la Secretaría Técnica, más el menú <b>Administración</b>: usuarios, validación de responsables y exportación de datos.</td></tr>
+    </tbody>
+  </table>
+  <p class="nota">Si no ve el formulario <i>Registrar avance</i> en un compromiso, su usuario tiene perfil de Consulta.</p>
+</section>
+
+<section class="panel" id="conceptos">
+  <h2>3. Conceptos básicos</h2>
+  <dl class="conceptos">
+    <dt>Reunión</dt><dd>Sesión del órgano colegiado (por ejemplo, la <i>LIV Asamblea Plenaria de la CNPJ</i>).</dd>
+    <dt>Acuerdo</dt><dd>Texto aprobado en la reunión, identificado por su clave (<code>CNPJ/LIV/07/2026</code>).</dd>
+    <dt>Compromiso</dt><dd>Cada acción verificable que se desprende de un acuerdo (sus incisos a, b, c… o numerales). Tiene un <b>responsable</b>, una <b>fecha límite</b> y un <b>entregable</b>. Es la unidad que se sigue.</dd>
+    <dt>Entrega</dt><dd>Cuando un compromiso obliga a varias instituciones (por ejemplo, "las 32 fiscalías enviarán observaciones"), cada institución tiene su propia entrega.</dd>
+    <dt>Avance</dt><dd>Nota fechada en la bitácora de un compromiso, con evidencia opcional. Queda registrado quién la capturó.</dd>
+  </dl>
+
+  <h3>Estatus</h3>
+  <p><span class="pill pendiente">Pendiente</span> sin acciones registradas ·
+     <span class="pill en_proceso">En proceso</span> con al menos un avance ·
+     <span class="pill cumplido">Cumplido</span> concluido ·
+     <span class="pill vencido">Vencido</span> pasó la fecha límite sin cumplirse ·
+     <span class="pill cancelado">Cancelado</span> quedó sin materia.</p>
+
+  <h3>Semáforo</h3>
+  <p><span class="sem verde"></span>cumplido ·
+     <span class="sem ambar"></span>vence en 30 días o menos ·
+     <span class="sem rojo"></span>vencido ·
+     <span class="sem gris"></span>sin urgencia o sin fecha límite.</p>
+
+  <h3>Cómo se calcula el avance</h3>
+  <ul>
+    <li><b>Compromiso individual:</b> el porcentaje que se captura en el último avance.</li>
+    <li><b>Compromiso con entregas:</b> instituciones que ya entregaron ÷ instituciones obligadas. El porcentaje capturado a mano no se usa.</li>
+    <li><b>Acuerdo:</b> promedio de sus compromisos (los cancelados no cuentan).</li>
+  </ul>
+</section>
+
+<section class="panel" id="tablero">
+  <h2>4. El tablero</h2>
+  <p>Es la página de inicio. Muestra:</p>
+  <ul>
+    <li><b>Indicadores:</b> total de compromisos, cumplidos, en proceso, sin iniciar, vencidos y, si los hay, responsables por validar.</li>
+    <li><b>Reuniones:</b> un punto de color por acuerdo. Pase el cursor sobre él para ver la clave y el avance; haga clic para abrirlo.</li>
+    <li><b>Vencidos</b> y <b>Vencen en los próximos 30 días:</b> lo que requiere atención inmediata.</li>
+    <li><b>Carga por responsable:</b> compromisos abiertos, vencidos y cumplidos de cada institución. El nombre lleva a sus pendientes.</li>
+  </ul>
+</section>
+
+<section class="panel" id="buscar">
+  <h2>5. Buscar por palabra o frase</h2>
+  <p>Escriba en la caja <b>Buscar en acuerdos…</b> de la barra superior y pulse Enter. El buscador revisa el texto
+    de los acuerdos, los compromisos, la bitácora de avances, los oficios y notas de las entregas, las instituciones
+    y las reuniones. Los resultados aparecen agrupados, con las coincidencias resaltadas.</p>
+  <table>
+    <thead><tr><th>Escriba</th><th>Encuentra</th></tr></thead>
+    <tbody>
+      <tr><td><code>extorsion</code></td><td>Todo lo que contenga "extorsión". No importan acentos ni mayúsculas.</td></tr>
+      <tr><td><code>manual extorsion</code></td><td>Registros que contienen <b>ambas</b> palabras, en cualquier orden.</td></tr>
+      <tr><td><code>"Secretaría Técnica"</code></td><td>La <b>frase exacta</b>, con las palabras juntas y en ese orden.</td></tr>
+      <tr><td><code>"Diario Oficial" protocolo</code></td><td>Se pueden combinar frases y palabras.</td></tr>
+      <tr><td><code>F-GTO</code> o <code>Guanajuato</code></td><td>Una institución y los compromisos donde es responsable.</td></tr>
+    </tbody>
+  </table>
+  <p>En la página de resultados puede limitar la búsqueda a <b>una reunión</b> con la lista desplegable.</p>
+  <p class="nota">Si no hay resultados, pruebe con menos palabras o con la raíz de la palabra (<code>capacita</code> encuentra
+    "capacitación" y "capacitar").</p>
+</section>
+
+<section class="panel" id="reunion">
+  <h2>6. Consultar una reunión</h2>
+  <ol class="pasos">
+    <li>Menú <b>Reuniones</b> y elija la sesión.</li>
+    <li>Use los filtros <i>Vencidos, En proceso, Pendientes, Cumplidos</i> para acotar la lista.</li>
+    <li>Pulse <b>Exportar CSV</b> para obtener todos los compromisos en un archivo que abre Excel. Incluye responsable, fecha límite, estatus, avance y si el responsable está validado.</li>
+  </ol>
+</section>
+
+<section class="panel" id="acuerdo">
+  <h2>7. Consultar un acuerdo</h2>
+  <p>Al abrir un acuerdo verá su <b>texto íntegro</b> y, debajo, cada <b>compromiso</b> con:</p>
+  <ul>
+    <li>Responsable y corresponsables, fecha límite, plazo tal como lo dice el acuerdo y entregable esperado.</li>
+    <li>La etiqueta <span class="pill por-validar">por validar</span> si el acuerdo no nombraba al responsable y se asignó por criterio. Pase el cursor sobre ella para ver el criterio.</li>
+    <li>La cuadrícula de <b>Entregas por institución</b> (<span class="ok">✔</span> entregado, ○ pendiente), si aplica.</li>
+    <li>La <b>bitácora</b> con todos los avances registrados y sus evidencias.</li>
+  </ul>
+</section>
+
+<section class="panel" id="avance">
+  <h2>8. Registrar un avance</h2>
+  <p class="meta">Perfiles: Enlace institucional y Secretaría Técnica.</p>
+  <ol class="pasos">
+    <li>Abra el acuerdo y localice el compromiso.</li>
+    <li>Despliegue <b>Registrar avance</b>.</li>
+    <li>Escriba una <b>descripción</b> clara: qué se hizo, número de oficio, fecha de reunión, etc.</li>
+    <li>Opcional: indique el nuevo <b>porcentaje</b> de avance (0 a 100).</li>
+    <li>Opcional: elija <b>Cambiar estatus a</b>. Si elige <i>Cumplido</i>, el avance pasa a 100% y se registra la fecha de cumplimiento.</li>
+    <li>Opcional: adjunte la <b>evidencia</b> (oficio escaneado, minuta, constancia).</li>
+    <li>Pulse <b>Guardar</b>. El avance aparece en la bitácora y el tablero se actualiza.</li>
+  </ol>
+  <p class="nota">Un compromiso <i>Pendiente</i> pasa a <i>En proceso</i> automáticamente con el primer avance. Los avances no se pueden borrar desde esta pantalla: si hubo un error, registre un avance aclaratorio o pida a la Secretaría Técnica que lo corrija.</p>
+</section>
+
+<section class="panel" id="entregas">
+  <h2>9. Registrar la entrega de una institución</h2>
+  <p class="meta">Perfiles: Enlace institucional y Secretaría Técnica.</p>
+  <ol class="pasos">
+    <li>En el acuerdo, despliegue <b>Entregas por institución</b> y haga clic en las siglas de la institución.</li>
+    <li>Cambie el <b>Estatus</b> a <i>Entregado</i> (o <i>No aplica</i>, si corresponde).</li>
+    <li>Capture la <b>fecha de entrega</b> y el <b>número de oficio</b>.</li>
+    <li>Adjunte la <b>evidencia</b> y, si hace falta, una nota.</li>
+    <li>Pulse <b>Guardar</b>. El avance del compromiso se recalcula solo.</li>
+  </ol>
+  <p class="nota">Cada enlace está ligado a su institución y solo puede actualizar las entregas de ella; el menú
+    <b>Mis pendientes</b> lleva directo a su lista. La Secretaría Técnica puede actualizar cualquier entrega.</p>
+</section>
+
+<section class="panel" id="institucion">
+  <h2>10. Pendientes de una institución</h2>
+  <p>Desde el tablero (sección <i>Carga por responsable</i>) o desde cualquier compromiso, haga clic en las siglas de una institución. La página reúne:</p>
+  <ul>
+    <li>Los compromisos donde es <b>responsable o corresponsable</b>, ordenados por fecha límite.</li>
+    <li>Las <b>entregas</b> que le corresponden, con su estatus y oficio.</li>
+  </ul>
+  <p class="nota">Sugerencia: guarde esa página en los favoritos del navegador para usarla como su lista de pendientes.</p>
+</section>
+
+<section class="panel" id="st">
+  <h2>11. Tareas de la Secretaría Técnica</h2>
+  <p class="meta">Los botones de captura solo aparecen para usuarios del perfil Secretaría Técnica.</p>
+
+  <h3>Registrar una nueva reunión</h3>
+  <ol class="pasos">
+    <li>Menú <b>Reuniones</b> → <b>+ Nueva reunión</b>.</li>
+    <li>Capture órgano, número de sesión (LV = 55), numeral romano, nombre, tipo, modalidad, fecha y sede.
+      Adjunte el acta o el documento de acuerdos en PDF; quedará disponible como <i>Descargar acta</i>.</li>
+    <li>Pulse <b>Guardar</b>. Se abre la página de la reunión, lista para capturar sus acuerdos.</li>
+  </ol>
+
+  <h3>Capturar los acuerdos</h3>
+  <p>Hay dos formas:</p>
+  <ul>
+    <li><b>Importar acuerdos desde texto</b> (recomendado). Abra el PDF de acuerdos, seleccione todo el texto
+      (Ctrl+A), cópielo (Ctrl+C) y péguelo en la página del importador. Pulse <b>Analizar texto</b>: el sistema
+      separa cada acuerdo por su clave (<code>CNPJ/LV/01/2027.</code>), quita encabezados y números de página, y
+      propone un título, la naturaleza y los temas. Corrija lo necesario, desmarque lo que no quiera registrar y
+      pulse <b>Registrar los acuerdos marcados</b>. Los acuerdos que ya existen aparecen atenuados y no se duplican.</li>
+    <li><b>+ Nuevo acuerdo</b>, uno por uno. El sistema sugiere el número y la clave siguientes. Use
+      <b>Guardar y capturar otro</b> para avanzar más rápido.</li>
+  </ul>
+  <p class="nota">Revise siempre el título y la naturaleza que propone el importador: se deducen del texto y pueden
+    requerir ajuste (por ejemplo, un acuerdo que "toma conocimiento" pero también aprueba algo).</p>
+
+  <h3>Desglosar cada acuerdo en compromisos</h3>
+  <ol class="pasos">
+    <li>Abra el acuerdo y pulse <b>+ Agregar compromiso</b>. Registre un compromiso por cada acción verificable
+      (sus incisos a, b, c… o numerales).</li>
+    <li>Capture la descripción, el <b>responsable</b>, los corresponsables (Ctrl+clic para varios), la fecha límite
+      si el acuerdo la fija, el plazo tal como lo dice el texto y el entregable esperado.</li>
+    <li>Si el acuerdo no nombra al responsable y usted lo asigna por criterio, <b>desmarque</b>
+      <i>Responsable validado</i> y explique el criterio en <i>Nota de asignación</i>.</li>
+    <li>En <b>Instituciones obligadas a entregar</b> elija: nadie más, las 32 estatales, todo el Pleno o una
+      selección. El sistema crea una entrega por cada institución obligada.</li>
+    <li>Pulse <b>Guardar y capturar otro</b> para seguir con el siguiente inciso.</li>
+  </ol>
+  <p class="nota">Si después cambia las instituciones obligadas, el sistema agrega las nuevas y retira las que ya no
+    aplican <b>solo si aún no tienen información</b> (oficio, fecha, evidencia o nota); las que ya la tienen se conservan.</p>
+
+  <h3>Corregir o eliminar</h3>
+  <ul>
+    <li>Cada reunión, acuerdo y compromiso tiene sus enlaces <b>Editar</b> y <b>Eliminar</b>.</li>
+    <li>Eliminar un acuerdo borra sus compromisos, entregas y bitácora. Para eliminar una reunión completa hay que
+      escribir su numeral (por ejemplo, LV) como confirmación.</li>
+  </ul>
+
+  <h3>Catálogos</h3>
+  <p>En el menú <b>Catálogos</b> se administran las <b>instituciones</b> (siglas, nombre oficial, tipo), los
+    <b>temas</b> (con su color) y los <b>órganos colegiados</b>. Una institución con compromisos no se puede eliminar:
+    márquela como inactiva para que deje de aparecer en las listas de captura.</p>
+
+  <h3>Corregir un avance o una entrega</h3>
+  <p>Las entregas se corrigen desde la cuadrícula <i>Entregas por institución</i> del acuerdo. Un avance registrado
+    por error no se borra: registre otro avance que lo aclare, para que la bitácora conserve la historia.</p>
+</section>
+
+<section class="panel" id="admin">
+  <h2>12. Administración del sistema</h2>
+  <p class="meta">Menú <b>Administración</b>, visible solo para el perfil Administrador del sistema.</p>
+
+  <h3>Panel</h3>
+  <p>Cifras generales, asuntos que requieren atención (vencidos, responsables por validar, enlaces sin institución,
+    usuarios que nunca han entrado), actividad reciente, últimos accesos e información técnica.</p>
+
+  <h3>Usuarios</h3>
+  <ol class="pasos">
+    <li><b>Usuarios → + Nuevo usuario:</b> capture usuario, nombre, apellidos y correo (el nombre aparece en la bitácora).</li>
+    <li>Elija el <b>perfil</b>. Para un <i>Enlace institucional</i> la <b>institución</b> es obligatoria.</li>
+    <li>Al guardar, el sistema muestra una <b>contraseña temporal</b> una sola vez. Entréguela de forma segura y pida a la
+      persona que la cambie en <i>Mi cuenta</i> al primer ingreso.</li>
+    <li>Si alguien olvida su contraseña: abra su usuario y pulse <b>Generar contraseña temporal</b>.</li>
+    <li>Para dar de baja a alguien, desmarque <b>Activo</b>; no se borra, para conservar la autoría de sus avances.</li>
+  </ol>
+  <p class="nota">Nadie puede cambiar su propio perfil ni desactivarse a sí mismo, para no perder el acceso de
+    administración por error.</p>
+
+  <h3>Validar responsables</h3>
+  <p>Lista los compromisos cuyo responsable se asignó por criterio, con la explicación de cada caso. Marque los
+    correctos y pulse <b>Confirmar los seleccionados</b>; para los demás use <b>Corregir</b>.</p>
+
+  <h3>Exportar datos</h3>
+  <p>Descarga todos los compromisos en CSV (se abre en Excel), una copia de los datos en JSON para auditoría, o el CSV
+    de una reunión. Los respaldos completos de la base de datos los realiza el servicio en la nube de forma automática.</p>
+</section>
+
+<section class="panel" id="cuenta">
+  <h2>13. Mi cuenta</h2>
+  <p>Haga clic en su <b>nombre de usuario</b>, en la barra superior, para cambiar su contraseña. Escriba la actual y
+    la nueva dos veces. Use al menos 8 caracteres y evite contraseñas comunes o parecidas a su nombre.</p>
+</section>
+
+<section class="panel" id="faq">
+  <h2>14. Preguntas frecuentes</h2>
+  <dl class="conceptos">
+    <dt>Capturé 60% pero la barra muestra otro valor.</dt>
+    <dd>El compromiso requiere entregas: su avance se calcula con las instituciones que ya entregaron, no con el porcentaje capturado.</dd>
+    <dt>Un compromiso aparece vencido aunque ya se cumplió.</dt>
+    <dd>Registre un avance con <i>Cambiar estatus a: Cumplido</i>. El sistema solo sabe lo que se captura.</dd>
+    <dt>Un compromiso no tiene fecha límite.</dt>
+    <dd>El acuerdo no la fijó. La Secretaría Técnica puede asignarla en Administración; mientras tanto, nunca aparecerá como vencido.</dd>
+    <dt>¿Qué tipo de archivos puedo subir como evidencia?</dt>
+    <dd>Cualquiera (PDF, imagen, Word, Excel). Prefiera PDF. Las evidencias solo las pueden descargar usuarios que hayan iniciado sesión.</dd>
+    <dt>No veo el menú Administración.</dt>
+    <dd>Es exclusivo del perfil Administrador del sistema.</dd>
+    <dt>Aparece una franja naranja de "MODO DE PRUEBA".</dt>
+    <dd>El sistema está configurado para pruebas: cualquier usuario puede agregar y modificar datos. No capture
+      información real hasta que el administrador lo desactive.</dd>
+  </dl>
+</section>
+
+</div>
+</div>
+{% endblock %}

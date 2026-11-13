@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Entrega · {{ entrega.institucion.siglas }}{% endblock %}
+{% block content %}
+<p class="meta"><a href="{{ entrega.compromiso.acuerdo.get_absolute_url }}#c{{ entrega.compromiso_id }}">← {{ entrega.compromiso }}</a></p>
+<h1>{{ entrega.institucion.nombre }}</h1>
+<p class="sub">{{ entrega.compromiso.descripcion }}</p>
+<div class="panel">
+  <form class="avance" method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div><label>Estatus</label>{{ form.estatus }}</div>
+    <div><label>Fecha de entrega</label>{{ form.fecha_entrega }}</div>
+    <div><label>Oficio / referencia</label>{{ form.oficio }}</div>
+    <div><label>Evidencia</label>{{ form.evidencia }}{% if entrega.evidencia %}<span class="meta">Actual: <a href="{% url 'seguimiento:evidencia' 'entrega' entrega.pk %}">descargar</a></span>{% endif %}</div>
+    <div class="full"><label>Nota</label>{{ form.nota }}</div>
+    {% if form.errors %}<div class="full msg error">{{ form.errors }}</div>{% endif %}
+    <div><button class="btn">Guardar</button></div>
+  </form>
+</div>
+{% endblock %}

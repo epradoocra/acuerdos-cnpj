@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Catálogos{% endblock %}
+{% block content %}
+<h1>Catálogos</h1>
+<p class="sub">Instituciones responsables, temas y órganos colegiados que se usan al capturar reuniones y acuerdos.
+  <a href="#instituciones">Instituciones</a> · <a href="#temas">Temas</a> · <a href="#organos">Órganos</a></p>
+
+<section class="panel" id="instituciones">
+  <h2 style="margin-top:0">Instituciones <a class="btn chico" href="{% url 'seguimiento:catalogo_crear' 'instituciones' %}">+ Nueva</a></h2>
+  <table>
+    <thead><tr><th>Siglas</th><th>Nombre</th><th>Tipo</th><th class="num">Compromisos</th><th>Activa</th><th></th></tr></thead>
+    <tbody>
+    {% for i in instituciones %}
+      <tr{% if not i.activa %} class="deshabilitado"{% endif %}><td><b>{{ i.siglas }}</b></td><td>{{ i.nombre }}</td><td>{{ i.get_tipo_display }}</td>
+        <td class="num">{{ i.n }}</td><td>{{ i.activa|yesno:"Sí,No" }}</td>
+        <td class="acc"><a href="{% url 'seguimiento:catalogo_editar' 'instituciones' i.pk %}">Editar</a>
+          {% if not i.n %}· <a href="{% url 'seguimiento:catalogo_borrar' 'instituciones' i.pk %}">Eliminar</a>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<div class="cols">
+<section class="panel" id="temas">
+  <h2 style="margin-top:0">Temas <a class="btn chico" href="{% url 'seguimiento:catalogo_crear' 'temas' %}">+ Nuevo</a></h2>
+  <table><tbody>
+  {% for t in temas %}
+    <tr><td><span class="tag" style="background:{{ t.color }}">{{ t.nombre }}</span></td><td class="num">{{ t.n }} acuerdo{{ t.n|pluralize }}</td>
+      <td class="acc"><a href="{% url 'seguimiento:catalogo_editar' 'temas' t.pk %}">Editar</a> · <a href="{% url 'seguimiento:catalogo_borrar' 'temas' t.pk %}">Eliminar</a></td></tr>
+  {% endfor %}
+  </tbody></table>
+</section>
+
+<section class="panel" id="organos">
+  <h2 style="margin-top:0">Órganos colegiados <a class="btn chico" href="{% url 'seguimiento:catalogo_crear' 'organos' %}">+ Nuevo</a></h2>
+  <table><tbody>
+  {% for o in organos %}
+    <tr><td><b>{{ o.siglas }}</b> {{ o.nombre }}</td><td class="num">{{ o.n }} {% if o.n == 1 %}reunión{% else %}reuniones{% endif %}</td>
+      <td class="acc"><a href="{% url 'seguimiento:catalogo_editar' 'organos' o.pk %}">Editar</a>
+        {% if not o.n %}· <a href="{% url 'seguimiento:catalogo_borrar' 'organos' o.pk %}">Eliminar</a>{% endif %}</td></tr>
+  {% endfor %}
+  </tbody></table>
+</section>
+</div>
+{% endblock %}

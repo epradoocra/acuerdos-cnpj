@@ -1,0 +1,8 @@
+<nav class="subnav" aria-label="Administración">
+  <a href="{% url 'seguimiento:admin_panel' %}" class="{% if seccion == 'panel' %}on{% endif %}">Panel</a>
+  <a href="{% url 'seguimiento:admin_usuarios' %}" class="{% if seccion == 'usuarios' %}on{% endif %}">Usuarios</a>
+  <a href="{% url 'seguimiento:admin_validar' %}" class="{% if seccion == 'validar' %}on{% endif %}">Validar responsables</a>
+  <a href="{% url 'seguimiento:catalogos' %}">Catálogos</a>
+  <a href="{% url 'seguimiento:admin_exportar' %}" class="{% if seccion == 'exportar' %}on{% endif %}">Exportar datos</a>
+  {% if user.is_superuser %}<a href="{% url 'admin:index' %}" class="tecnica" title="Panel técnico de Django, solo para soporte">Administración técnica ↗</a>{% endif %}
+</nav>

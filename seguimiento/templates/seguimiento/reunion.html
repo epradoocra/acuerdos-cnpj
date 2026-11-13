@@ -1,0 +1,43 @@
+{% extends "base.html" %}{% load seguimiento_tags %}
+{% block title %}{{ reunion.nombre }}{% endblock %}
+{% block content %}
+<h1>{{ reunion.nombre }}</h1>
+<p class="sub">{{ reunion.get_tipo_display }} · {{ reunion.get_modalidad_display }}{% if reunion.fecha %} · {{ reunion.fecha|date:"j \d\e F \d\e Y" }}{% endif %}{% if reunion.sede %} · {{ reunion.sede }}{% endif %}
+  · <a href="{% url 'seguimiento:exportar_reunion' reunion.pk %}">Exportar CSV</a>{% if reunion.acta %}
+  · <a href="{% url 'seguimiento:evidencia' 'acta' reunion.pk %}">Descargar acta</a>{% endif %}</p>
+{% if perms.seguimiento.add_acuerdo or perms.seguimiento.change_reunion %}
+<p class="barra-acciones">
+  {% if perms.seguimiento.add_acuerdo %}<a class="btn chico" href="{% url 'seguimiento:acuerdo_crear' reunion.pk %}">+ Nuevo acuerdo</a>
+  <a class="btn chico sec" href="{% url 'seguimiento:acuerdos_importar' reunion.pk %}">Importar acuerdos desde texto</a>{% endif %}
+  {% if perms.seguimiento.change_reunion %}<a href="{% url 'seguimiento:reunion_editar' reunion.pk %}">Editar reunión</a>{% endif %}
+  {% if perms.seguimiento.delete_reunion %}· <a class="peligro-link" href="{% url 'seguimiento:reunion_borrar' reunion.pk %}">Eliminar</a>{% endif %}
+</p>
+{% endif %}
+
+<p class="filtros">Filtrar:
+  <a href="?" class="{% if not estatus %}on{% endif %}">Todos</a>
+  <a href="?estatus=vencido" class="{% if estatus == 'vencido' %}on{% endif %}">Vencidos</a>
+  <a href="?estatus=en_proceso" class="{% if estatus == 'en_proceso' %}on{% endif %}">En proceso</a>
+  <a href="?estatus=pendiente" class="{% if estatus == 'pendiente' %}on{% endif %}">Pendientes</a>
+  <a href="?estatus=cumplido" class="{% if estatus == 'cumplido' %}on{% endif %}">Cumplidos</a>
+</p>
+
+<div class="panel">
+<table>
+  <thead><tr><th>Clave</th><th>Acuerdo</th><th>Naturaleza</th><th>Coordina</th><th>Compromisos</th><th style="width:140px">Avance</th><th>Estatus</th></tr></thead>
+  <tbody>
+  {% for a in acuerdos %}
+    <tr>
+      <td><a href="{{ a.get_absolute_url }}"><b>{{ a.clave }}</b></a></td>
+      <td>{{ a.titulo }}<div>{% for t in a.temas.all %}<span class="tag" style="background:{{ t.color }}">{{ t.nombre }}</span>{% endfor %}</div></td>
+      <td>{{ a.get_naturaleza_display }}</td>
+      <td>{{ a.responsable.siglas|default:"—" }}</td>
+      <td class="num">{{ a.compromisos.all|length }}</td>
+      <td>{% barra a.avance %}</td>
+      <td>{% estatus a.estatus %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="7">Sin acuerdos con ese filtro.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

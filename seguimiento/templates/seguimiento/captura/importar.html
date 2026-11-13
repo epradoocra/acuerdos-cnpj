@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Importar acuerdos · {{ reunion.numeral }}{% endblock %}
+{% block content %}
+<p class="meta"><a href="{{ reunion.get_absolute_url }}">← {{ reunion.nombre }}</a></p>
+<h1>Importar acuerdos desde texto</h1>
+<p class="sub">Copie el texto del documento de acuerdos (desde el PDF o Word) y péguelo aquí. El sistema separa cada
+  acuerdo por su clave y propone título, naturaleza y temas para que los revise antes de guardarlos.</p>
+
+<form method="post">{% csrf_token %}
+  <div class="panel captura">
+    <div class="campo ancho">
+      <label for="id_texto">{{ form.texto.label }}</label>{{ form.texto }}
+      <small class="meta">{{ form.texto.help_text }}</small>
+      {% for e in form.texto.errors %}<small class="err">{{ e }}</small>{% endfor %}
+    </div>
+    <div class="acciones full"><button class="btn {% if detectados %}sec{% endif %}" name="accion" value="revisar">
+      {% if detectados %}Volver a analizar{% else %}Analizar texto{% endif %}</button></div>
+  </div>
+
+  {% if detectados %}
+  <h2>{{ detectados|length }} acuerdo{{ detectados|length|pluralize }} detectado{{ detectados|length|pluralize }}</h2>
+  <p class="meta">Revise y corrija el título y la naturaleza. Los compromisos de cada acuerdo se capturan después,
+    desde la página del acuerdo.</p>
+  <div class="panel">
+  <table class="importar">
+    <thead><tr><th></th><th>Clave</th><th>Título y texto</th><th>Naturaleza</th><th>Temas propuestos</th></tr></thead>
+    <tbody>
+    {% for d in detectados %}
+      <tr class="{% if d.existe %}deshabilitado{% endif %}">
+        <td><input type="checkbox" name="incluir_{{ d.indice }}" value="1" {% if not d.existe %}checked{% else %}disabled{% endif %} aria-label="Incluir {{ d.clave }}"></td>
+        <td><b>{{ d.clave }}</b>
+          {% if d.existe %}<div class="err">Ya registrado</div>
+          {% elif d.otra_reunion %}<div class="aviso">El numeral no coincide con {{ reunion.numeral }}</div>{% endif %}</td>
+        <td><input name="titulo_{{ d.indice }}" value="{{ d.titulo }}" maxlength="250" aria-label="Título">
+          <details><summary>Ver texto ({{ d.texto|length }} caracteres)</summary><div class="texto">{{ d.texto }}</div></details></td>
+        <td><select name="naturaleza_{{ d.indice }}" aria-label="Naturaleza">
+          {% for v, e in naturalezas %}<option value="{{ v }}" {% if v == d.naturaleza %}selected{% endif %}>{{ e }}</option>{% endfor %}
+        </select></td>
+        <td class="meta">{{ d.temas|join:", "|default:"—" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="acciones"><button class="btn" name="accion" value="crear">Registrar los acuerdos marcados</button>
+    <a href="{{ reunion.get_absolute_url }}">Cancelar</a></div>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}

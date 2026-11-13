@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% load seguimiento_tags %}
+{% block title %}{{ institucion.siglas }} · Compromisos{% endblock %}
+{% block content %}
+<h1>{{ institucion.nombre }}</h1>
+<p class="sub">{{ institucion.get_tipo_display }}{% if institucion.entidad_federativa %} · {{ institucion.entidad_federativa }}{% endif %}</p>
+
+<h2>Compromisos como responsable o corresponsable</h2>
+<div class="panel">
+<table>
+  <thead><tr><th>Compromiso</th><th>Reunión</th><th>Responsable</th><th>Fecha límite</th><th>Estatus</th></tr></thead>
+  <tbody>
+  {% for c in compromisos %}
+    <tr><td><span class="sem {{ c.semaforo }}"></span><a href="{{ c.acuerdo.get_absolute_url }}#c{{ c.pk }}">{{ c }}</a><div class="meta">{{ c.descripcion|truncatechars:120 }}</div></td>
+        <td>{{ c.acuerdo.reunion.numeral }}</td><td>{{ c.responsable.siglas }}</td>
+        <td>{{ c.fecha_limite|date:"d/m/Y"|default:"—" }}</td>
+        <td>{% if c.vencido %}{% estatus "vencido" %}{% else %}{% estatus c.estatus %}{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="5" class="meta">Sin compromisos directos.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2>Entregas que le corresponden</h2>
+<div class="panel">
+<table>
+  <thead><tr><th>Compromiso</th><th>Fecha límite</th><th>Estatus</th><th>Fecha de entrega</th><th>Oficio</th></tr></thead>
+  <tbody>
+  {% for e in entregas %}
+    <tr><td><a href="{% url 'seguimiento:editar_entrega' e.pk %}">{{ e.compromiso }}</a><div class="meta">{{ e.compromiso.descripcion|truncatechars:120 }}</div></td>
+        <td>{{ e.compromiso.fecha_limite|date:"d/m/Y"|default:"—" }}</td>
+        <td>{{ e.get_estatus_display }}</td><td>{{ e.fecha_entrega|date:"d/m/Y"|default:"—" }}</td><td>{{ e.oficio }}</td></tr>
+  {% empty %}<tr><td colspan="5" class="meta">Sin entregas asignadas.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

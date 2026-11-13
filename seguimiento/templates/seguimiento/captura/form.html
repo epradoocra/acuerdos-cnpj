@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<p class="meta"><a href="{{ cancelar }}">← Volver</a></p>
+<h1>{{ titulo }}</h1>
+{% if subtitulo %}<p class="sub">{{ subtitulo }}</p>{% endif %}
+
+<form class="panel captura" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+  {% include "seguimiento/captura/_campos.html" %}
+  <div class="acciones full">
+    <button class="btn" name="guardar">Guardar</button>
+    {% if otro %}<button class="btn sec" name="otro" value="1">Guardar y capturar otro</button>{% endif %}
+    <a href="{{ cancelar }}">Cancelar</a>
+  </div>
+</form>
+
+{% if form.obligados %}
+<script>
+  // Muestra la lista de instituciones solo cuando se elige "Instituciones seleccionadas".
+  (function () {
+    var sel = document.getElementById("id_obligados"), caja = document.getElementById("campo-seleccion");
+    function ver() { caja.style.display = sel.value === "seleccion" ? "" : "none"; }
+    sel.addEventListener("change", ver); ver();
+  })();
+</script>
+{% endif %}
+{% endblock %}

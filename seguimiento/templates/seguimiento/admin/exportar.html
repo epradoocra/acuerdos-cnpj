@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Exportar datos · Administración{% endblock %}
+{% block content %}
+<h1>Exportar datos</h1>
+{% with seccion="exportar" %}{% include "seguimiento/admin/_subnav.html" %}{% endwith %}
+
+<div class="cols">
+  <section class="panel">
+    <h2 style="margin-top:0">Todos los compromisos (Excel / CSV)</h2>
+    <p>Una fila por compromiso de todas las reuniones: acuerdo, responsable, fechas, estatus, avance, entregas
+      hechas contra obligadas, validación y último avance. Se abre directamente en Excel.</p>
+    <a class="btn" href="{% url 'seguimiento:admin_exportar_compromisos' %}">Descargar CSV</a>
+  </section>
+  <section class="panel">
+    <h2 style="margin-top:0">Copia de los datos (JSON)</h2>
+    <p>Todos los registros del seguimiento (reuniones, acuerdos, compromisos, entregas, bitácora y catálogos) en
+      formato JSON, útil para auditoría o migración. No incluye usuarios, contraseñas ni archivos de evidencia.</p>
+    <a class="btn sec" href="{% url 'seguimiento:admin_exportar_json' %}">Descargar JSON</a>
+  </section>
+</div>
+
+<section class="panel">
+  <h2 style="margin-top:0">Por reunión</h2>
+  <table><tbody>
+  {% for r in reuniones %}<tr><td>{{ r.nombre }}</td><td class="acc"><a href="{% url 'seguimiento:exportar_reunion' r.pk %}">CSV de la reunión</a></td></tr>
+  {% empty %}<tr><td class="meta">Sin reuniones.</td></tr>{% endfor %}
+  </tbody></table>
+  <p class="meta">Los respaldos completos de la base de datos los hace Azure SQL automáticamente (restauración a un punto en el tiempo); las evidencias se guardan en el almacenamiento del App Service.</p>
+</section>
+{% endblock %}

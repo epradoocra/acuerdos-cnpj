@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+{% block content %}
+<div class="panel login">
+  <h1>Iniciar sesión</h1>
+  <p class="sub">Sistema de Seguimiento de Acuerdos</p>
+  {% if form.errors %}<div class="msg error">Usuario o contraseña incorrectos.</div>{% endif %}
+  <form method="post">{% csrf_token %}
+    <p><label for="id_username">Usuario</label>{{ form.username }}</p>
+    <p><label for="id_password">Contraseña</label>{{ form.password }}</p>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn">Entrar</button>
+  </form>
+  <p class="meta" style="margin-top:14px">¿Primera vez? Consulte el <a href="{% url 'seguimiento:manual' %}">manual de usuario</a>.</p>
+</div>
+{% endblock %}

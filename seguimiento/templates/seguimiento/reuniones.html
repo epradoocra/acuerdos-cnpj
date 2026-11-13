@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Reuniones · Seguimiento de Acuerdos{% endblock %}
+{% block content %}
+<h1>Reuniones {% if perms.seguimiento.add_reunion %}<a class="btn chico" href="{% url 'seguimiento:reunion_crear' %}">+ Nueva reunión</a>{% endif %}</h1>
+<p class="sub">Sesiones registradas y sus acuerdos.</p>
+<div class="panel">
+<table>
+  <thead><tr><th>Órgano</th><th>Reunión</th><th>Tipo</th><th>Modalidad</th><th>Fecha</th><th class="num">Acuerdos</th></tr></thead>
+  <tbody>
+  {% for r in reuniones %}
+    <tr><td>{{ r.organo.siglas }}</td><td><a href="{{ r.get_absolute_url }}">{{ r.nombre }}</a></td>
+        <td>{{ r.get_tipo_display }}</td><td>{{ r.get_modalidad_display }}</td>
+        <td>{{ r.fecha|date:"d/m/Y"|default:"—" }}</td><td class="num">{{ r.n_acuerdos }}</td></tr>
+  {% empty %}<tr><td colspan="6">Sin reuniones.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

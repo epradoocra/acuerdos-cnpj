@@ -1,0 +1,10 @@
+venv/
+.venv/
+.env
+.git/
+db.sqlite3
+media/
+staticfiles/
+migracion/
+__pycache__/
+*.pyc

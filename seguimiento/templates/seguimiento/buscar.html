@@ -1,0 +1,59 @@
+{% extends "base.html" %}{% load seguimiento_tags %}
+{% block title %}{% if q %}{{ q }} · {% endif %}Buscar{% endblock %}
+{% block content %}
+<h1>Buscar</h1>
+
+<form class="panel buscador" method="get" action="{% url 'seguimiento:buscar' %}">
+  <input type="search" name="q" value="{{ q }}" placeholder='Palabras o "frase exacta"' autofocus aria-label="Texto a buscar">
+  <select name="reunion" aria-label="Reunión">
+    <option value="">Todas las reuniones</option>
+    {% for r in todas_reuniones %}<option value="{{ r.pk }}" {% if r.pk == reunion_id %}selected{% endif %}>{{ r.organo.siglas }} {{ r.numeral }}</option>{% endfor %}
+  </select>
+  <button class="btn">Buscar</button>
+  <p class="meta ayuda">Varias palabras: aparecen todas (<code>extorsion manual</code>). Entre comillas: frase exacta
+    (<code>"Secretaría Técnica"</code>). No distingue mayúsculas ni acentos.</p>
+</form>
+
+{% if q and not terminos %}
+  <p class="meta">Escriba al menos dos caracteres.</p>
+{% elif terminos %}
+  <p class="sub">{{ total }} resultado{{ total|pluralize }} para
+    {% for t in terminos %}<mark>{{ t }}</mark>{% if not forloop.last %} + {% endif %}{% endfor %}
+    {% if secciones|length > 1 %} · {% for s in secciones %}<a href="#{{ s.clave }}">{{ s.titulo }} ({{ s.n }})</a>{% if not forloop.last %} · {% endif %}{% endfor %}{% endif %}
+  </p>
+
+  {% for s in secciones %}
+  <section class="panel resultados" id="{{ s.clave }}">
+    <h2>{{ s.titulo }} <span class="meta">({{ s.n }}{% if s.n > limite %}, se muestran {{ limite }}{% endif %})</span></h2>
+    <ul>
+    {% for o in s.items %}
+      {% if s.clave == "acuerdos" %}
+        <li><a href="{{ o.get_absolute_url }}"><b>{{ o.clave }}</b></a> · {% resaltar o.titulo terminos %}
+          <div class="frag">{% resaltar o.texto terminos 260 %}</div></li>
+      {% elif s.clave == "compromisos" %}
+        <li><a href="{{ o.acuerdo.get_absolute_url }}#c{{ o.pk }}"><b>{{ o }}</b></a>
+          · {% resaltar o.responsable.siglas terminos %} · {% if o.vencido %}{% estatus "vencido" %}{% else %}{% estatus o.estatus %}{% endif %}
+          <div class="frag">{% resaltar o.descripcion terminos 260 %}</div>
+          {% if o.entregable %}<div class="meta">Entregable: {% resaltar o.entregable terminos %}</div>{% endif %}</li>
+      {% elif s.clave == "avances" %}
+        <li><a href="{{ o.compromiso.acuerdo.get_absolute_url }}#c{{ o.compromiso_id }}"><b>{{ o.compromiso }}</b></a>
+          · <span class="meta">{{ o.fecha|date:"d/m/Y" }} · {{ o.registrado_por.get_full_name|default:o.registrado_por.username|default:"sistema" }}</span>
+          <div class="frag">{% resaltar o.descripcion terminos 260 %}</div></li>
+      {% elif s.clave == "entregas" %}
+        <li><a href="{% url 'seguimiento:editar_entrega' o.pk %}"><b>{{ o.institucion.siglas }}</b></a> · {{ o.compromiso }} · {{ o.get_estatus_display }}
+          <div class="frag">{% if o.oficio %}Oficio: {% resaltar o.oficio terminos %}{% endif %} {% resaltar o.nota terminos 200 %}</div></li>
+      {% elif s.clave == "instituciones" %}
+        <li><a href="{% url 'seguimiento:institucion' o.pk %}"><b>{% resaltar o.siglas terminos %}</b></a> · {% resaltar o.nombre terminos %}
+          {% if o.entidad_federativa %}<span class="meta">· {% resaltar o.entidad_federativa terminos %}</span>{% endif %}</li>
+      {% elif s.clave == "reuniones" %}
+        <li><a href="{{ o.get_absolute_url }}">{% resaltar o.nombre terminos %}</a>
+          <span class="meta">· {{ o.fecha|date:"d/m/Y"|default:"sin fecha" }}{% if o.sede %} · {% resaltar o.sede terminos %}{% endif %}</span></li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+  </section>
+  {% empty %}
+  <div class="panel"><p>Sin resultados. Pruebe con menos palabras o sin comillas.</p></div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

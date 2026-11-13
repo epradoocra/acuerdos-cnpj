@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<p class="meta"><a href="{{ cancelar }}">← Usuarios</a></p>
+<h1>{{ titulo }}</h1>
+<p class="sub">Último acceso: {{ usuario.last_login|date:"d/m/Y H:i"|default:"nunca" }} · Alta: {{ usuario.date_joined|date:"d/m/Y" }}
+  · {{ n_avances }} avance{{ n_avances|pluralize }} registrado{{ n_avances|pluralize }}</p>
+
+<form class="panel captura" method="post" novalidate>{% csrf_token %}
+  {% include "seguimiento/captura/_campos.html" %}
+  <div class="acciones full"><button class="btn">Guardar</button> <a href="{{ cancelar }}">Cancelar</a></div>
+</form>
+
+<section class="panel">
+  <h2 style="margin-top:0">Contraseña</h2>
+  {% if es_yo %}
+    <p>Para cambiar su propia contraseña use <a href="{% url 'password_change' %}">Mi cuenta</a>.</p>
+  {% else %}
+    <p>Si la persona olvidó su contraseña, genere una temporal y entréguesela de forma segura. Se mostrará una sola vez.</p>
+    <form method="post" action="{% url 'seguimiento:admin_usuario_restablecer' usuario.pk %}">{% csrf_token %}
+      <button class="btn sec">Generar contraseña temporal</button></form>
+  {% endif %}
+  <p class="meta">Para dar de baja a alguien desmarque <b>Activo</b>: se conserva su autoría en la bitácora.</p>
+</section>
+{% endblock %}

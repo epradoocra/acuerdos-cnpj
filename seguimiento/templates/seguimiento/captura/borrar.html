@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<p class="meta"><a href="{{ cancelar }}">← Volver</a></p>
+<h1>{{ titulo }}</h1>
+<div class="panel">
+  <p>Se eliminará <b>{{ objeto }}</b>{% if consecuencias %}, junto con:{% else %}.{% endif %}</p>
+  {% if consecuencias %}<ul>{% for c in consecuencias %}<li>{{ c }}</li>{% endfor %}</ul>{% endif %}
+  <p class="nota-roja">Esta acción no se puede deshacer.</p>
+  <form method="post">{% csrf_token %}
+    {% if palabra %}
+      <p><label for="confirmacion">Para confirmar escriba <b>{{ palabra }}</b></label>
+         <input id="confirmacion" name="confirmacion" autocomplete="off" style="max-width:200px"></p>
+    {% endif %}
+    <button class="btn peligro">Eliminar</button> <a href="{{ cancelar }}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

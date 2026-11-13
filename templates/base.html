@@ -1,0 +1,41 @@
+{% load static %}<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Seguimiento de Acuerdos{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'seguimiento/app.css' %}">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="{% url 'seguimiento:tablero' %}">Seguimiento de Acuerdos</a>
+    {% if user.is_authenticated %}
+    <form class="busca-top" method="get" action="{% url 'seguimiento:buscar' %}" role="search">
+      <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar en acuerdos…" aria-label="Buscar">
+    </form>
+    <nav>
+      <a href="{% url 'seguimiento:tablero' %}">Tablero</a>
+      <a href="{% url 'seguimiento:reuniones' %}">Reuniones</a>
+      {% if mi_institucion %}<a href="{% url 'seguimiento:institucion' mi_institucion.pk %}">Mis pendientes</a>{% endif %}
+      {% if perms.seguimiento.change_institucion %}<a href="{% url 'seguimiento:catalogos' %}">Catálogos</a>{% endif %}
+      {% if perms.auth.change_user %}<a href="{% url 'seguimiento:admin_panel' %}">Administración</a>{% endif %}
+      <a href="{% url 'seguimiento:manual' %}">Manual</a>
+      <a href="{% url 'password_change' %}" title="Mi cuenta">{{ user.username }}</a>
+      <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}
+        <button class="link">Salir</button>
+      </form>
+    </nav>
+    {% else %}
+    <nav><a href="{% url 'seguimiento:manual' %}">Manual</a><a href="{% url 'login' %}">Iniciar sesión</a></nav>
+    {% endif %}
+  </div>
+</header>
+{% if modo_prueba %}<div class="modo-prueba" role="status">MODO DE PRUEBA — todos los usuarios pueden agregar y modificar datos.
+  Desactívelo antes de usar el sistema con información real.</div>{% endif %}
+<main class="wrap">
+  {% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

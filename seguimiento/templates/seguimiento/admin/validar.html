@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Validar responsables · Administración{% endblock %}
+{% block content %}
+<h1>Validar responsables</h1>
+{% with seccion="validar" %}{% include "seguimiento/admin/_subnav.html" %}{% endwith %}
+<p class="sub">Compromisos cuyo responsable se asignó por criterio porque el acuerdo no lo nombra. Si el responsable
+  es correcto, márquelo y confírmelo; si no, use <b>Corregir</b>.</p>
+
+{% if pendientes %}
+<form method="post">{% csrf_token %}
+<div class="panel">
+<table>
+  <thead><tr><th><input type="checkbox" id="todos" aria-label="Seleccionar todos"></th><th>Compromiso</th><th>Responsable asignado</th><th>Criterio de asignación</th><th></th></tr></thead>
+  <tbody>
+  {% for c in pendientes %}
+    <tr><td><input type="checkbox" name="ids" value="{{ c.pk }}" class="sel" aria-label="Validar {{ c }}"></td>
+      <td><a href="{{ c.acuerdo.get_absolute_url }}#c{{ c.pk }}"><b>{{ c }}</b></a><div class="meta">{{ c.descripcion|truncatechars:120 }}</div></td>
+      <td><b>{{ c.responsable.siglas }}</b>{% with cor=c.corresponsables.all %}{% if cor %}<div class="meta">con {% for i in cor %}{{ i.siglas }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>{% endif %}{% endwith %}</td>
+      <td class="meta">{{ c.nota_asignacion|default:"—" }}</td>
+      <td class="acc"><a href="{% url 'seguimiento:compromiso_editar' c.pk %}">Corregir</a></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="acciones"><button class="btn">Confirmar los seleccionados</button> <span class="meta">{{ pendientes|length }} pendiente{{ pendientes|length|pluralize }}</span></div>
+</div>
+</form>
+<script>
+  document.getElementById("todos").addEventListener("change", function (e) {
+    document.querySelectorAll(".sel").forEach(function (c) { c.checked = e.target.checked; });
+  });
+</script>
+{% else %}
+<div class="panel"><p class="ok">No hay responsables pendientes de validar.</p></div>
+{% endif %}
+{% endblock %}

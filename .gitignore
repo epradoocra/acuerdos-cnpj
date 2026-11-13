@@ -1,0 +1,15 @@
+# Entornos y secretos
+venv/
+.venv/
+.env
+
+# Archivos generados
+db.sqlite3
+staticfiles/
+media/
+__pycache__/
+*.pyc
+
+# Datos exportados para la migración: contienen usuarios y hashes de contraseñas. NUNCA subirlos a GitHub.
+migracion/*.json
+migracion/*.tgz

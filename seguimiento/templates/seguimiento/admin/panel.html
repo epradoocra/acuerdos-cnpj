@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Administración del sistema{% endblock %}
+{% block content %}
+<h1>Administración del sistema</h1>
+{% with seccion="panel" %}{% include "seguimiento/admin/_subnav.html" %}{% endwith %}
+
+<div class="kpis">
+  {% for etiqueta, n in cifras %}<div class="kpi"><b>{{ n }}</b><span>{{ etiqueta }}</span></div>{% endfor %}
+</div>
+
+<div class="cols" style="margin-top:16px">
+  <section class="panel">
+    <h2 style="margin-top:0">Requiere atención</h2>
+    <table><tbody>
+    {% for etiqueta, n, ruta, extra in atencion %}
+      <tr><td><a href="{% url ruta %}{{ extra }}">{{ etiqueta }}</a></td>
+          <td class="num">{% if n %}<b class="alerta">{{ n }}</b>{% else %}<span class="ok">0</span>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody></table>
+  </section>
+  <section class="panel">
+    <h2 style="margin-top:0">Usuarios <a class="btn chico" href="{% url 'seguimiento:admin_usuario_crear' %}">+ Nuevo usuario</a></h2>
+    <table><tbody>
+      {% for perfil, n in perfiles %}<tr><td><a href="{% url 'seguimiento:admin_usuarios' %}?perfil={{ perfil|urlencode }}&amp;estado=activos">{{ perfil }}</a></td><td class="num">{{ n }}</td></tr>{% endfor %}
+      <tr><td><b>Total de usuarios activos</b></td><td class="num"><b>{{ usuarios_activos }}</b></td></tr>
+    </tbody></table>
+  </section>
+</div>
+
+<div class="cols">
+  <section class="panel">
+    <h2 style="margin-top:0">Actividad reciente <span class="meta">({{ avances_30 }} avance{{ avances_30|pluralize }} en 30 días)</span></h2>
+    <ul class="bitacora">
+    {% for a in ultimos_avances %}
+      <li><span class="meta">{{ a.creado|date:"d/m/Y H:i" }} · {{ a.registrado_por.get_full_name|default:a.registrado_por.username|default:"sistema" }}</span><br>
+        <a href="{{ a.compromiso.acuerdo.get_absolute_url }}#c{{ a.compromiso_id }}">{{ a.compromiso }}</a> — {{ a.descripcion|truncatechars:90 }}</li>
+    {% empty %}<li class="meta">Aún no se registran avances.</li>{% endfor %}
+    </ul>
+  </section>
+  <section class="panel">
+    <h2 style="margin-top:0">Últimos accesos</h2>
+    <table><tbody>
+    {% for u in ultimos_accesos %}
+      <tr><td><a href="{% url 'seguimiento:admin_usuario_editar' u.pk %}">{{ u.get_full_name|default:u.username }}</a></td>
+          <td class="num meta">{{ u.last_login|date:"d/m/Y H:i" }}</td></tr>
+    {% empty %}<tr><td class="meta">Sin registros.</td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+</div>
+
+<section class="panel">
+  <h2 style="margin-top:0">Información técnica</h2>
+  <table><tbody>
+    {% for etiqueta, valor in tecnico %}<tr><td style="width:220px">{{ etiqueta }}</td><td>{{ valor }}</td></tr>{% endfor %}
+  </tbody></table>
+  <p class="meta">Los respaldos de la base de datos los hace Azure SQL automáticamente (restauración a un punto
+    en el tiempo, desde el portal de Azure). Desde aquí puede descargar copias de los datos en
+    <a href="{% url 'seguimiento:admin_exportar' %}">Exportar datos</a>.</p>
+</section>
+{% endblock %}

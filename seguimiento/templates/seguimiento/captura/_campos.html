@@ -1,0 +1,14 @@
+{% load seguimiento_tags %}{% for campo in form.hidden_fields %}{{ campo }}{% endfor %}
+{% if form.non_field_errors %}<div class="msg error full">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+{% for campo in form.visible_fields %}{% with t=campo|tipo_campo %}
+  <div class="campo {{ t }}{% if campo.errors %} con-error{% endif %}" id="campo-{{ campo.name }}">
+    {% if t == "casilla" %}
+      <label class="casilla">{{ campo }} {{ campo.label }}</label>
+    {% else %}
+      <label for="{{ campo.id_for_label }}">{{ campo.label }}{% if campo.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ campo }}
+    {% endif %}
+    {% if campo.help_text %}<small class="meta">{{ campo.help_text }}</small>{% endif %}
+    {% for e in campo.errors %}<small class="err">{{ e }}</small>{% endfor %}
+  </div>
+{% endwith %}{% endfor %}

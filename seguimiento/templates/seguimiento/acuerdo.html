@@ -1,0 +1,76 @@
+{% extends "base.html" %}{% load seguimiento_tags %}
+{% block title %}{{ acuerdo.clave }}{% endblock %}
+{% block content %}
+<p class="meta"><a href="{{ acuerdo.reunion.get_absolute_url }}">← {{ acuerdo.reunion.nombre }}</a></p>
+<h1>{{ acuerdo.clave }} {% estatus acuerdo.estatus %}</h1>
+<p class="sub">{{ acuerdo.titulo }} · {{ acuerdo.get_naturaleza_display }}{% if acuerdo.responsable %} · Coordina: {{ acuerdo.responsable.nombre }}{% endif %}</p>
+{% if perms.seguimiento.change_acuerdo or perms.seguimiento.add_compromiso %}
+<p class="barra-acciones">
+  {% if perms.seguimiento.add_compromiso %}<a class="btn chico" href="{% url 'seguimiento:compromiso_crear' acuerdo.pk %}">+ Agregar compromiso</a>{% endif %}
+  {% if perms.seguimiento.change_acuerdo %}<a href="{% url 'seguimiento:acuerdo_editar' acuerdo.pk %}">Editar acuerdo</a>{% endif %}
+  {% if perms.seguimiento.delete_acuerdo %}· <a class="peligro-link" href="{% url 'seguimiento:acuerdo_borrar' acuerdo.pk %}">Eliminar</a>{% endif %}
+</p>
+{% endif %}
+
+<div class="panel">
+  <div style="max-width:320px">{% barra acuerdo.avance %}</div>
+  <h2>Texto del acuerdo</h2>
+  <div class="texto">{{ acuerdo.texto }}</div>
+</div>
+
+<h2>Compromisos derivados</h2>
+<div class="panel">
+{% for c in compromisos %}
+  <div class="comp" id="c{{ c.pk }}">
+    <div><span class="sem {{ c.semaforo }}"></span><b>{% if c.inciso %}{{ c.inciso }}) {% endif %}</b>{{ c.descripcion }}
+      {% if perms.seguimiento.change_compromiso %}<span class="acc-comp"><a href="{% url 'seguimiento:compromiso_editar' c.pk %}">Editar</a>{% if perms.seguimiento.delete_compromiso %} · <a class="peligro-link" href="{% url 'seguimiento:compromiso_borrar' c.pk %}">Eliminar</a>{% endif %}</span>{% endif %}</div>
+    <div class="meta">
+      Responsable: <a href="{% url 'seguimiento:institucion' c.responsable.pk %}">{{ c.responsable.siglas }}</a>{% if not c.responsable_validado %} <span class="pill por-validar" title="{{ c.nota_asignacion }}">por validar</span>{% endif %}
+      {% with cor=c.corresponsables.all %}{% if cor %} · Corresponsables: {% for i in cor %}{{ i.siglas }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% endwith %}
+      · Fecha límite: {{ c.fecha_limite|date:"d/m/Y"|default:"sin fecha" }}{% if c.plazo_texto %} ({{ c.plazo_texto }}){% endif %}
+      {% if c.entregable %} · Entregable: {{ c.entregable }}{% endif %}
+    </div>
+    <div style="display:flex; gap:12px; align-items:center; margin:6px 0">
+      {% if c.vencido %}{% estatus "vencido" %}{% else %}{% estatus c.estatus %}{% endif %}
+      <div style="width:180px">{% barra c.avance_efectivo %}</div>
+    </div>
+
+    {% if c.requiere_entregas %}
+      {% with ent=c.entregas.all %}
+      <details {% if ent|length < 40 %}open{% endif %}>
+        <summary>Entregas por institución</summary>
+        <div class="entregas">
+          {% for e in ent %}<a class="{{ e.estatus }}" href="{% url 'seguimiento:editar_entrega' e.pk %}" title="{{ e.institucion.nombre }} — {{ e.get_estatus_display }}">{% if e.estatus == 'entregado' %}✔{% else %}○{% endif %} {{ e.institucion.siglas }}</a>{% endfor %}
+        </div>
+      </details>
+      {% endwith %}
+    {% endif %}
+
+    {% with av=c.avances.all %}{% if av %}
+      <ul class="bitacora">
+      {% for a in av %}
+        <li><span class="meta">{{ a.fecha|date:"d/m/Y" }} · {{ a.registrado_por.get_full_name|default:a.registrado_por.username|default:"sistema" }}{% if a.porcentaje is not None %} · {{ a.porcentaje }}%{% endif %}{% if a.nuevo_estatus %} · → {{ a.get_nuevo_estatus_display }}{% endif %}</span><br>
+          {{ a.descripcion }}{% if a.evidencia %} · <a href="{% url 'seguimiento:evidencia' 'avance' a.pk %}">evidencia</a>{% endif %}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}{% endwith %}
+
+    {% if perms.seguimiento.add_avance %}
+    <details>
+      <summary>Registrar avance</summary>
+      <form class="avance" method="post" enctype="multipart/form-data" action="{% url 'seguimiento:registrar_avance' c.pk %}">{% csrf_token %}
+        <div class="full"><label>Descripción</label>{{ form.descripcion }}</div>
+        <div><label>Fecha</label>{{ form.fecha }}</div>
+        <div><label>Avance (%)</label>{{ form.porcentaje }}</div>
+        <div><label>Cambiar estatus a</label>{{ form.nuevo_estatus }}</div>
+        <div><label>Evidencia</label>{{ form.evidencia }}</div>
+        <div><button class="btn">Guardar</button></div>
+      </form>
+    </details>
+    {% endif %}
+  </div>
+{% empty %}
+  <p class="meta">Este acuerdo no tiene compromisos capturados.{% if perms.seguimiento.add_compromiso %} <a href="{% url 'seguimiento:compromiso_crear' acuerdo.pk %}">Agregar el primero</a>.{% endif %}</p>
+{% endfor %}
+</div>
+{% endblock %}
