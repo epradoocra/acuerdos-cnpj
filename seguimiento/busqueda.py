@@ -14,14 +14,22 @@ import re
 import unicodedata
 
 from django.db import connection
-from django.db.models import F, Q
-from django.db.models.functions import Collate
+from django.db.models import F, Func, Q
 from django.db.models.lookups import IContains
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 # Intercalación de SQL Server que no distingue mayúsculas (CI) ni acentos (AI).
 COLACION_SIN_ACENTOS = "Latin1_General_100_CI_AI"
+
+
+class SinAcentos(Func):
+    """``campo COLLATE Latin1_General_100_CI_AI`` para SQL Server.
+
+    No se usa ``django.db.models.functions.Collate`` porque con mssql-django escribe el nombre entre
+    corchetes (``COLLATE [Latin1_General_100_CI_AI]``) y SQL Server lo rechaza: "Incorrect syntax near ...".
+    """
+    template = "%(expressions)s COLLATE " + COLACION_SIN_ACENTOS
 
 _TOKEN = re.compile(r'"([^"]*)"|(\S+)')
 MAX_TERMINOS = 10
@@ -57,7 +65,7 @@ def filtro(campos, terms):
         alguno = Q()
         for campo in campos:
             if motor == "microsoft":
-                alguno |= Q(IContains(Collate(F(campo), COLACION_SIN_ACENTOS), normalizar(t)))
+                alguno |= Q(IContains(SinAcentos(F(campo)), normalizar(t)))
             elif motor == "postgresql":
                 alguno |= Q(**{f"{campo}__unaccent__icontains": normalizar(t)})
             else:
