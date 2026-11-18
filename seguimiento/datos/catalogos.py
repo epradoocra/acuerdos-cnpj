@@ -54,6 +54,26 @@ NOMBRES_OFICIALES = {
     "ZAC": "Fiscalía General de Justicia del Estado de Zacatecas",
 }
 
+# Regionalización de la CNPJ (mapa oficial de zonas, confirmado por el usuario el 14/11/2026). Abreviaturas de ENTIDADES.
+ZONAS = {
+    "Noroeste": ["BC", "BCS", "CHIH", "SIN", "SON"],
+    "Noreste": ["COAH", "DGO", "NL", "SLP", "TAMS", "ZAC"],
+    "Occidente": ["AGS", "COL", "GTO", "JAL", "MICH", "NAY", "QRO"],
+    "Centro": ["CDMX", "MEX", "HGO", "MOR", "PUE", "TLAX"],
+    "Sureste": ["CAMP", "CHIS", "GRO", "OAX", "QROO", "TAB", "VER", "YUC"],
+}
+
+
+def siglas_estatal(abrev):
+    """Siglas con que el sistema identifica a la fiscalía/procuraduría de una entidad."""
+    return "FGJCDMX" if abrev == "CDMX" else f"F-{abrev}"
+
+
+def zona(nombre):
+    """Siglas de las fiscalías/procuradurías que integran una zona de la CNPJ."""
+    return [siglas_estatal(a) for a in ZONAS[nombre]]
+
+
 # Prefijo del nombre genérico que usaban versiones anteriores; si una institución aún lo tiene,
 # cargar_liv lo sustituye por el oficial (sin tocar nombres editados a mano).
 PREFIJO_GENERICO = "Fiscalía / Procuraduría General de "
@@ -61,8 +81,7 @@ PREFIJO_GENERICO = "Fiscalía / Procuraduría General de "
 
 def fiscalias_estatales():
     for abrev, entidad in ENTIDADES:
-        siglas = "FGJCDMX" if abrev == "CDMX" else f"F-{abrev}"
-        yield (siglas, NOMBRES_OFICIALES[abrev], entidad)
+        yield (siglas_estatal(abrev), NOMBRES_OFICIALES[abrev], entidad)
 
 
 # (siglas, nombre, tipo)
