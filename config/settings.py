@@ -9,7 +9,6 @@ Base de datos, por orden de prioridad:
   3. SQLite (solo desarrollo local)    -> en cualquier otro caso
 """
 import os
-import tempfile
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -151,24 +150,6 @@ LOGGING = {
 }
 
 LOGIN_URL = "login"
-
-# Correo saliente (SMTP) y recuperación de la cuenta de administrador (ver seguimiento/recuperar_admin.py).
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT") or 587)
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
-EMAIL_TIMEOUT = 20
-DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_FROM") or EMAIL_HOST_USER or "webmaster@localhost"
-EMAIL_CONFIGURADO = bool(EMAIL_HOST and EMAIL_HOST_USER and EMAIL_HOST_PASSWORD)
-ADMIN_RESET_EMAIL = os.environ.get("ADMIN_RESET_EMAIL", "")  # único correo que recibe la liga
-ADMIN_RESET_USERNAME = os.environ.get("ADMIN_RESET_USERNAME") or "admin"
-PASSWORD_RESET_TIMEOUT = 3600  # la liga caduca en una hora
-# Dominio de la liga: fijo, para no depender del encabezado Host de quien hace la solicitud.
-PORTAL_URL = os.environ.get("PORTAL_URL") or (f"https://{os.environ['WEBSITE_HOSTNAME']}" if EN_AZURE else "")
-# Caché en archivo: la comparten todos los procesos de gunicorn (límite de solicitudes).
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-                      "LOCATION": os.path.join(tempfile.gettempdir(), "acuerdos-cache")}}
 
 # Modo de prueba: cualquier usuario con sesión puede agregar y modificar datos (ver seguimiento/permisos.py).
 MODO_PRUEBA = env_bool("DJANGO_MODO_PRUEBA", False)
