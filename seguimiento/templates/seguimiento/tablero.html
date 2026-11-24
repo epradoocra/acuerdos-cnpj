@@ -10,7 +10,7 @@
   <div class="kpi"><b>{{ en_proceso }}</b><span>En proceso</span></div>
   <div class="kpi"><b>{{ pendientes }}</b><span>Sin iniciar</span></div>
   <div class="kpi rojo"><b>{{ n_vencidos }}</b><span>Vencidos sin cumplir</span></div>
-  {% if por_validar %}<div class="kpi ambar"><b>{{ por_validar }}</b><span>{% if user.is_staff %}<a href="{% url 'admin:seguimiento_compromiso_changelist' %}?responsable_validado__exact=0">Responsables por validar</a>{% else %}Responsables por validar{% endif %}</span></div>{% endif %}
+  {% if por_validar %}<div class="kpi ambar"><b>{{ por_validar }}</b><span>{% if perms.auth.change_user %}<a href="{% url 'seguimiento:admin_validar' %}">Responsables por validar</a>{% else %}Responsables por validar{% endif %}</span></div>{% endif %}
 </div>
 
 <h2>Reuniones</h2>

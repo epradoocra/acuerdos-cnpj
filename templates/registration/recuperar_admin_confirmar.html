@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Nueva contraseña{% endblock %}
+{% block content %}
+<h1>Nueva contraseña del administrador</h1>
+{% if validlink %}
+<form class="panel captura" method="post" novalidate style="max-width:560px">{% csrf_token %}
+  {% include "seguimiento/captura/_campos.html" %}
+  <div class="acciones full"><button class="btn">Cambiar contraseña</button></div>
+</form>
+{% else %}
+<div class="panel"><div class="msg error">La liga no es válida: ya se usó o caducó.</div>
+  <p><a href="{% url 'recuperar_admin' %}">Solicitar otra liga</a></p></div>
+{% endif %}
+{% endblock %}

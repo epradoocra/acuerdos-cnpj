@@ -127,7 +127,6 @@ table.importar details summary { font-weight: 400; font-size: 13px; }
 .subnav a { padding: 8px 12px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
 .subnav a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 .subnav a:hover { text-decoration: none; color: var(--accent); }
-.subnav a.tecnica { margin-left: auto; font-size: 13px; }
 .filtros-form { display: grid; grid-template-columns: 1fr 220px 240px auto; gap: 8px; }
 @media (max-width: 800px) { .filtros-form { grid-template-columns: 1fr; } }
 b.alerta { color: var(--rojo); }
